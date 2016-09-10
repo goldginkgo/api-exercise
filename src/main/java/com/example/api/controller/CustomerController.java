@@ -20,16 +20,17 @@ import com.example.api.dao.CustomerDAO;
 public class CustomerController {
 
     @Autowired
-    private CustomerDAO customerDAO;
+    private CustomerDAO customerDao;
 
     @GetMapping("/customers")
-    public List getCustomers() {
-        return customerDAO.list();
+    public ResponseEntity getCustomers() {
+        List<Customer> customers = customerDao.list();
+        return new ResponseEntity(customers, HttpStatus.OK);
     }
 
     @GetMapping("/customers/{id}")
     public ResponseEntity getCustomer(@PathVariable("id") Long id) {
-        Customer customer = customerDAO.get(id);
+        Customer customer = customerDao.get(id);
         if (customer == null) {
             return new ResponseEntity("No Customer found for ID " + id, HttpStatus.NOT_FOUND);
         }
@@ -39,15 +40,15 @@ public class CustomerController {
 
     @PostMapping(value = "/customers")
     public ResponseEntity createCustomer(@RequestBody Customer customer) {
-
-        customerDAO.create(customer);
+        // TODO customer validation
+        customerDao.create(customer);
 
         return new ResponseEntity(customer, HttpStatus.OK);
     }
 
     @DeleteMapping("/customers/{id}")
     public ResponseEntity deleteCustomer(@PathVariable Long id) {
-        if (null == customerDAO.delete(id)) {
+        if (null == customerDao.delete(id)) {
             return new ResponseEntity("No Customer found for ID " + id, HttpStatus.NOT_FOUND);
         }
 
@@ -56,7 +57,8 @@ public class CustomerController {
 
     @PutMapping("/customers/{id}")
     public ResponseEntity updateCustomer(@PathVariable Long id, @RequestBody Customer customer) {
-        customer = customerDAO.update(id, customer);
+        // TODO customer validation
+        customer = customerDao.update(id, customer);
 
         if (null == customer) {
             return new ResponseEntity("No Customer found for ID " + id, HttpStatus.NOT_FOUND);
