@@ -59,7 +59,6 @@ public class Customer {
 
         Customer customer = (Customer) o;
 
-        if (!id.equals(customer.id)) return false;
         if (!name.equals(customer.name)) return false;
         if (!address.equals(customer.address)) return false;
         return telephone.equals(customer.telephone);
@@ -68,8 +67,7 @@ public class Customer {
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + name.hashCode();
+        int result = name.hashCode();
         result = 31 * result + address.hashCode();
         result = 31 * result + telephone.hashCode();
         return result;

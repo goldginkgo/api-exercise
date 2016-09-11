@@ -34,6 +34,14 @@ public class CustomerDAO {
      * @return customer object with updated id
      */
     public Customer create(Customer customer) {
+        if (customer.getName() == null || customer.getAddress() == null || customer.getTelephone() == null) {
+            return null;
+        }
+        for (Customer c : this.database.getCustomers()) {
+            if (c.equals(customer)) {
+                return null;
+            }
+        }
         customer.setId(counter.incrementAndGet());
         this.database.getCustomers().add(customer);
         return customer;
@@ -84,6 +92,9 @@ public class CustomerDAO {
      * @return customer object with id
      */
     public Customer update(Long id, Customer customer) {
+        if (customer.getName() == null || customer.getAddress() == null || customer.getTelephone() == null) {
+            return null;
+        }
         for (Customer c :  this.database.getCustomers()) {
             if (c.getId().equals(id)) {
                 customer.setId(c.getId());

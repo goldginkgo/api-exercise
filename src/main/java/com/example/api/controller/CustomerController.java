@@ -22,6 +22,17 @@ public class CustomerController {
     @Autowired
     private CustomerDAO customerDao;
 
+    @PostMapping(value = "/customers")
+    public ResponseEntity createCustomer(@RequestBody Customer customer) {
+        Customer newCustomer = customerDao.create(customer);
+
+        if ( null == newCustomer) {
+            return new ResponseEntity("customer already exists or bad request", HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity(customer, HttpStatus.OK);
+        }
+    }
+
     @GetMapping("/customers")
     public ResponseEntity getCustomers() {
         List<Customer> customers = customerDao.list();
@@ -34,14 +45,6 @@ public class CustomerController {
         if (customer == null) {
             return new ResponseEntity("No Customer found for ID " + id, HttpStatus.NOT_FOUND);
         }
-
-        return new ResponseEntity(customer, HttpStatus.OK);
-    }
-
-    @PostMapping(value = "/customers")
-    public ResponseEntity createCustomer(@RequestBody Customer customer) {
-        // TODO customer validation
-        customerDao.create(customer);
 
         return new ResponseEntity(customer, HttpStatus.OK);
     }
