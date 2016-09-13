@@ -29,13 +29,13 @@ public class CustomerController {
     @PostMapping(value = "/customers")
     public ResponseEntity createCustomer(@RequestBody Customer customer) {
         Customer newCustomer = customerDao.create(customer);
-
         if ( null == newCustomer) {
             logger.error("Creating Customer (" + customer + ") failed. Customer already exists or bad request.");
-            return new ResponseEntity("Customer already exists or bad request", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Creating Customer failed. Customer already exists or bad request.",
+                                        HttpStatus.BAD_REQUEST);
         } else {
             logger.info("Customer (" + customer + ") created successfully.");
-            return new ResponseEntity(customer, HttpStatus.OK);
+            return new ResponseEntity<>(customer, HttpStatus.OK);
         }
     }
 
@@ -43,7 +43,7 @@ public class CustomerController {
     public ResponseEntity getCustomers() {
         List<Customer> customers = customerDao.list();
         logger.info("Customers " + customers + " retrieved successfully.");
-        return new ResponseEntity(customers, HttpStatus.OK);
+        return new ResponseEntity<>(customers, HttpStatus.OK);
     }
 
     @GetMapping("/customers/{id}")
@@ -51,22 +51,24 @@ public class CustomerController {
         Customer customer = customerDao.get(id);
         if (customer == null) {
             logger.error("Getting Customer failed. No Customer found for ID " + id);
-            return new ResponseEntity("No Customer found for ID " + id, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Getting Customer failed. No Customer found for ID " + id,
+                                        HttpStatus.NOT_FOUND);
         }
 
         logger.info("Customer (" + customer + ") retrieved successfully.");
-        return new ResponseEntity(customer, HttpStatus.OK);
+        return new ResponseEntity<>(customer, HttpStatus.OK);
     }
 
     @DeleteMapping("/customers/{id}")
     public ResponseEntity deleteCustomer(@PathVariable Long id) {
         if (null == customerDao.delete(id)) {
             logger.error("Deleting Customer failed. No Customer found for ID " + id);
-            return new ResponseEntity("No Customer found for ID " + id, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Deleting Customer failed. No Customer found for ID " + id,
+                                        HttpStatus.NOT_FOUND);
         }
 
         logger.info("Customer deleted successfully. Customer ID=" + id);
-        return new ResponseEntity(id, HttpStatus.OK);
+        return new ResponseEntity<>(id, HttpStatus.OK);
     }
 
     @PutMapping("/customers/{id}")
@@ -75,11 +77,12 @@ public class CustomerController {
 
         if (null == customer) {
             logger.error("Updating Customer failed. Bad request or no Customer found for ID " + id);
-            return new ResponseEntity("No Customer found forID " + id, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Deleting Customer failed. Bad request or no Customer found for ID " + id,
+                                        HttpStatus.BAD_REQUEST);
         }
 
         logger.info("Customer updated successfully. CustomerID=" + id);
-        return new ResponseEntity(customer, HttpStatus.OK);
+        return new ResponseEntity<>(customer, HttpStatus.OK);
     }
 
 }

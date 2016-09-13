@@ -8,8 +8,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.*;
@@ -26,13 +25,11 @@ public class CustomerControllerTest {
 
     private Customer customer1;
     private Customer customer2;
-    private Customer customer3;
 
     @Before
     public void setUp() throws Exception {
         customer1 = new Customer(101, "Lily", "12 Queen Street", "021-123-4567");
         customer2 = new Customer(102, "Jack", "11 Lake Road", "021-234-5678");
-        customer3 = new Customer(103, "Jerry", "12 Lake Road", "027-345-6789");
     }
 
     @After
@@ -44,15 +41,30 @@ public class CustomerControllerTest {
     }
 
     @Test
-    public void createCustomer() throws Exception {
+    public void createCustomerSuccessful() throws Exception {
         ResponseEntity entity = this.restTemplate.postForEntity("/customers", customer1, Customer.class);
         assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
+    public void createCustomerWithNullAttributes() throws Exception {
+        Customer customer = new Customer(101, null, null, null);
+        ResponseEntity entity = this.restTemplate.postForEntity("/customers", customer, String.class);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void createCustomerWithExistCustomer() throws Exception {
+        ResponseEntity entity = this.restTemplate.postForEntity("/customers", customer1, Customer.class);
+        Customer customer = new Customer(104, "Lily", "12 Queen Street", "021-123-4567");
+        ResponseEntity entity2 = this.restTemplate.postForEntity("/customers", customer, String.class);
+        assertThat(entity2.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
     public void getNotExistCustomer() throws Exception {
         String message = this.restTemplate.getForObject("/customers/1", String.class);
-        assertEquals("No Customer found for ID 1", message);
+        assertEquals("Getting Customer failed. No Customer found for ID 1", message);
     }
 
     @Test
@@ -79,7 +91,7 @@ public class CustomerControllerTest {
     }
 
     @Test
-    public void deleteCustomer() throws Exception {
+    public void deleteExistCustomer() throws Exception {
         // add 1 customer
         ResponseEntity entity = this.restTemplate.postForEntity("/customers", customer1, Customer.class);
         Customer customer = (Customer)entity.getBody();
@@ -91,7 +103,21 @@ public class CustomerControllerTest {
     }
 
     @Test
-    public void updateCustomer() throws Exception {
+    public void deleteNotExistCustomer() throws Exception {
+        // add 1 customer
+        this.restTemplate.postForEntity("/customers", customer1, Customer.class);
+       // delete another customer
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Customer> entity = new HttpEntity<>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange("/customers/1001",
+                HttpMethod.DELETE, entity, String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void updateCustomerSuccessful() throws Exception {
         // add 1 customer
         ResponseEntity entity = this.restTemplate.postForEntity("/customers", customer1, Customer.class);
         Customer customer = (Customer)entity.getBody();
@@ -99,9 +125,43 @@ public class CustomerControllerTest {
         // update customer
         Customer customerNew = new Customer(customerId, "Lily", "12 High Street", "021-123-4567");
         restTemplate.put("/customers/" + customerId, customerNew);
-        //get the customer
+        // get the customer
         Customer customerGet = this.restTemplate.getForObject("/customers/" + customerId, Customer.class);
+
         assertEquals("12 High Street", customerGet.getAddress());
     }
 
+    @Test
+    public void updateNotExistCustomer() throws Exception {
+        // add 1 customer
+        ResponseEntity entity = this.restTemplate.postForEntity("/customers", customer1, Customer.class);
+        Customer customer = (Customer)entity.getBody();
+        long customerId = customer.getId();
+        // update not exist customer
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Customer> entityUpdate = new HttpEntity<>(customer, headers);
+        ResponseEntity<String> response = restTemplate.exchange("/customers/1000",
+                HttpMethod.PUT, entityUpdate, String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void updateCustomerWithInvalidValue() throws Exception {
+        // add 1 customer
+        ResponseEntity entity = this.restTemplate.postForEntity("/customers", customer1, Customer.class);
+        Customer customer = (Customer)entity.getBody();
+        long customerId = customer.getId();
+        // set address to null
+        customer.setName(null);
+        // update customer
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Customer> entityUpdate = new HttpEntity<>(customer, headers);
+        ResponseEntity<String> response = restTemplate.exchange("/customers/" + customerId,
+                HttpMethod.PUT, entityUpdate, String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
 }

@@ -8,15 +8,18 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class CustomerDAOTest {
-    private Customer customer1 = new Customer(101, "Lily", "12 Queen Street", "021-123-4567");
-    private Customer customer2 = new Customer(102, "Jack", "11 Lake Road", "021-234-5678");
-    private Customer customer3 = new Customer(103, "Jerry", "12 Lake Road", "027-345-6789");
+    private Customer customer1;
+    private Customer customer2;
+    private Customer customer3;
 
-    private CustomerDAO customerDao = new CustomerDAO(new Database());
+    private CustomerDAO customerDao;
 
     @Before
     public void setUp() throws Exception {
-
+        customer1 = new Customer(101, "Lily", "12 Queen Street", "021-123-4567");
+        customer2 = new Customer(102, "Jack", "11 Lake Road", "021-234-5678");
+        customer3 = new Customer(103, "Jerry", "12 Lake Road", "027-345-6789");
+        customerDao = new CustomerDAO(new Database());
     }
 
     @After
@@ -30,16 +33,53 @@ public class CustomerDAOTest {
     }
 
     @Test
-    public void create() throws Exception {
+    public void createCustomerSuccessful() throws Exception {
         assertEquals(0, customerDao.list().size());
         customerDao.create(customer1);
         assertEquals(1, customerDao.list().size());
     }
 
     @Test
-    public void get() throws Exception {
-        Customer customerCreated = customerDao.create(customer1);
-        Customer customerGet = customerDao.get((long) 1);
+    public void createCustomerWithNullAttributes() throws Exception {
+        assertEquals(0, customerDao.list().size());
+        Customer customer = new Customer(101, null, null, null);
+        Customer customerCreate = customerDao.create(customer);
+        assertNull(customerCreate);
+        assertEquals(0, customerDao.list().size());
+    }
+
+    @Test
+    public void createCustomerWithNullPhone() throws Exception {
+        assertEquals(0, customerDao.list().size());
+        Customer customer = new Customer(101, "Lily", "Address", null);
+        Customer customerCreate = customerDao.create(customer);
+        assertNull(customerCreate);
+        assertEquals(0, customerDao.list().size());
+    }
+
+    @Test
+    public void createCustomerWithNullAddressAndPhone() throws Exception {
+        assertEquals(0, customerDao.list().size());
+        Customer customer = new Customer(101, "Lily", null, null);
+        Customer customerCreate = customerDao.create(customer);
+        assertNull(customerCreate);
+        assertEquals(0, customerDao.list().size());
+    }
+
+    @Test
+    public void createExistCustomer() throws Exception {
+        assertEquals(0, customerDao.list().size());
+        customerDao.create(customer1);
+        Customer customerCreate = customerDao.create(customer1);
+        assertNull(customerCreate);
+        assertEquals(1, customerDao.list().size());
+    }
+
+    @Test
+    public void getCustomerSuccessful() throws Exception {
+        customerDao.create(customer1);
+        Customer customerCreated = customerDao.create(customer2);
+        Customer customerGet = customerDao.get((long) 2);
         assertEquals(customerCreated, customerGet);
     }
 
@@ -50,7 +90,7 @@ public class CustomerDAOTest {
     }
 
     @Test
-    public void delete() throws Exception {
+    public void deleteCustomerSuccessful() throws Exception {
         customerDao.create(customer1);
         customerDao.create(customer2);
         customerDao.create(customer3);
@@ -61,23 +101,51 @@ public class CustomerDAOTest {
     }
 
     @Test
-    public void deleteNullCustomer() throws Exception {
+    public void deleteNotExistCustomer() throws Exception {
         Long id = customerDao.delete((long) 2);
         assertNull(id);
     }
 
     @Test
-    public void update() throws Exception {
+    public void updateSuccessful() throws Exception {
         customerDao.create(customer1);
-        customerDao.update((long) 1, customer2);
-        Customer customer = customerDao.get((long) 1);
-        assertEquals(customer2.getName(), customer.getName());
-        assertEquals(customer2.getAddress(), customer.getAddress());
-        assertEquals(customer2.getTelephone(), customer.getTelephone());
+        customerDao.create(customer2);
+        customerDao.update((long) 2, customer3);
+        Customer customer = customerDao.get((long) 2);
+        assertEquals(customer3.getName(), customer.getName());
+        assertEquals(customer3.getAddress(), customer.getAddress());
+        assertEquals(customer3.getTelephone(), customer.getTelephone());
     }
 
     @Test
-    public void updateNullCustomer() throws Exception {
+    public void updateCustomerWithNullName() throws Exception {
+        customerDao.create(customer2);
+        customer2.setName(null);
+        Customer customer = customerDao.update((long) 2, customer2);
+        assertNull(customer);
+    }
+
+    @Test
+    public void updateCustomerWithNullNameAndAddress() throws Exception {
+        customerDao.create(customer2);
+        customer2.setName(null);
+        customer2.setTelephone(null);
+        Customer customer = customerDao.update((long) 2, customer2);
+        assertNull(customer);
+    }
+
+    @Test
+    public void updateCustomerWithNullAttributes() throws Exception {
+        customerDao.create(customer2);
+        customer2.setName(null);
+        customer2.setAddress(null);
+        customer2.setTelephone(null);
+        Customer customer = customerDao.update((long) 2, customer2);
+        assertNull(customer);
+    }
+
+    @Test
+    public void updateNotExistCustomer() throws Exception {
         Customer customer = customerDao.update((long) 1, customer2);
         assertNull(customer);
     }
