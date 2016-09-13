@@ -59,10 +59,7 @@ public class Customer {
 
         Customer customer = (Customer) o;
 
-        if (!name.equals(customer.name)) return false;
-        if (!address.equals(customer.address)) return false;
-        return telephone.equals(customer.telephone);
-
+        return name.equals(customer.name) && address.equals(customer.address) && telephone.equals(customer.telephone);
     }
 
     @Override
@@ -71,5 +68,14 @@ public class Customer {
         result = 31 * result + address.hashCode();
         result = 31 * result + telephone.hashCode();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "name='" + name + '\'' +
+                ", address='" + address + '\'' +
+                ", telephone='" + telephone + '\'' +
+                '}';
     }
 }

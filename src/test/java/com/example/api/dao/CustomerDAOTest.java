@@ -8,20 +8,15 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class CustomerDAOTest {
-    private Customer customer1;
-    private Customer customer2;
-    private Customer customer3;
+    private Customer customer1 = new Customer(101, "Lily", "12 Queen Street", "021-123-4567");
+    private Customer customer2 = new Customer(102, "Jack", "11 Lake Road", "021-234-5678");
+    private Customer customer3 = new Customer(103, "Jerry", "12 Lake Road", "027-345-6789");
 
-    private CustomerDAO customerDao;
+    private CustomerDAO customerDao = new CustomerDAO(new Database());
 
     @Before
     public void setUp() throws Exception {
-        customer1 = new Customer(101, "Lily", "12 Queen Street", "021-123-4567");
-        customer2 = new Customer(102, "Jack", "11 Lake Road", "021-234-5678");
-        customer3 = new Customer(103, "Jerry", "12 Lake Road", "027-345-6789");
 
-        Database database = new Database();
-        customerDao = new CustomerDAO(database);
     }
 
     @After

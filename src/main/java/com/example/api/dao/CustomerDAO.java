@@ -26,8 +26,9 @@ public class CustomerDAO {
     }
 
     /**
-     * Create new customer in dummy database. Updates the id and insert new
-     * customer in list.
+     * Create new customer in dummy database.
+     * Updates the id and insert new customer in list.
+     * If customer already exists or customer's attribute is null, returns null.
      *
      * @param customer
      *            Customer object
@@ -48,8 +49,8 @@ public class CustomerDAO {
     }
 
     /**
-     * Return customer object for given id from dummy database. If customer is
-     * not found for id, returns null.
+     * Return customer object for given id from dummy database.
+     * If customer is not found for id, returns null.
      *
      * @param id
      *            customer id
@@ -65,8 +66,8 @@ public class CustomerDAO {
     }
 
     /**
-     * Delete the customer object from dummy database. If customer not found for
-     * given id, returns null.
+     * Delete the customer object from dummy database.
+     * If customer not found for given id, returns null.
      *
      * @param id
      *            the customer id
@@ -84,17 +85,20 @@ public class CustomerDAO {
     }
 
     /**
-     * Update the customer object for given id in dummy database. If customer
-     * not exists, returns null
+     * Update the customer object for given id in dummy database.
+     * If customer not exists or customer's attribute is null, returns null.
      *
      * @param id
+     *            customer id
      * @param customer
+     *            Customer object
      * @return customer object with id
      */
     public Customer update(Long id, Customer customer) {
         if (customer.getName() == null || customer.getAddress() == null || customer.getTelephone() == null) {
             return null;
         }
+
         for (Customer c :  this.database.getCustomers()) {
             if (c.getId().equals(id)) {
                 customer.setId(c.getId());
