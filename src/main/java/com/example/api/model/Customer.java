@@ -1,7 +1,5 @@
 package com.example.api.model;
 
-import org.springframework.stereotype.Component;
-
 public class Customer {
 
     private Long id;
