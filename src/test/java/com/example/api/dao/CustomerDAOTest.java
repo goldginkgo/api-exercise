@@ -118,28 +118,25 @@ public class CustomerDAOTest {
     }
 
     @Test
+    public void updateCustomerWithNullTelephone() throws Exception {
+        customerDao.create(customer2);
+        customer2.setTelephone(null);
+        Customer customer = customerDao.update((long) 2, customer2);
+        assertNull(customer);
+    }
+
+    @Test
+    public void updateCustomerWithNullAddress() throws Exception {
+        customerDao.create(customer2);
+        customer2.setAddress(null);
+        Customer customer = customerDao.update((long) 2, customer2);
+        assertNull(customer);
+    }
+
+    @Test
     public void updateCustomerWithNullName() throws Exception {
         customerDao.create(customer2);
         customer2.setName(null);
-        Customer customer = customerDao.update((long) 2, customer2);
-        assertNull(customer);
-    }
-
-    @Test
-    public void updateCustomerWithNullNameAndAddress() throws Exception {
-        customerDao.create(customer2);
-        customer2.setName(null);
-        customer2.setTelephone(null);
-        Customer customer = customerDao.update((long) 2, customer2);
-        assertNull(customer);
-    }
-
-    @Test
-    public void updateCustomerWithNullAttributes() throws Exception {
-        customerDao.create(customer2);
-        customer2.setName(null);
-        customer2.setAddress(null);
-        customer2.setTelephone(null);
         Customer customer = customerDao.update((long) 2, customer2);
         assertNull(customer);
     }
