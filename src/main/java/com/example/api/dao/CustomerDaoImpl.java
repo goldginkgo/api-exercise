@@ -3,16 +3,15 @@ package com.example.api.dao;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.springframework.stereotype.Component;
-
 import com.example.api.model.Customer;
+import org.springframework.stereotype.Repository;
 
-@Component
-public class CustomerDAO {
+@Repository
+public class CustomerDaoImpl implements  CustomerDao{
     private Database database;
     private final AtomicLong counter = new AtomicLong();
 
-    public CustomerDAO(Database database) {
+    public CustomerDaoImpl(Database database) {
         this.database = database;
     }
 

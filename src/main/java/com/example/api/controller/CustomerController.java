@@ -2,6 +2,7 @@ package com.example.api.controller;
 
 import java.util.List;
 
+import com.example.api.service.CustomerService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,19 +17,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.api.model.Customer;
-import com.example.api.dao.CustomerDAO;
 
 @RestController
 public class CustomerController {
 
     @Autowired
-    private CustomerDAO customerDao;
+    private CustomerService customerService;
 
     private static final Logger logger = LogManager.getLogger(CustomerController.class.getName());
 
     @PostMapping(value = "/customers")
     public ResponseEntity createCustomer(@RequestBody Customer customer) {
-        Customer newCustomer = customerDao.create(customer);
+        Customer newCustomer = customerService.create(customer);
         if ( null == newCustomer) {
             logger.error("Creating Customer (" + customer + ") failed. Customer already exists or bad request.");
             return new ResponseEntity<>("Creating Customer failed. Customer already exists or bad request.",
@@ -41,14 +41,14 @@ public class CustomerController {
 
     @GetMapping("/customers")
     public ResponseEntity getCustomers() {
-        List<Customer> customers = customerDao.list();
+        List<Customer> customers = customerService.list();
         logger.info("Customers " + customers + " retrieved successfully.");
         return new ResponseEntity<>(customers, HttpStatus.OK);
     }
 
     @GetMapping("/customers/{id}")
     public ResponseEntity getCustomer(@PathVariable("id") Long id) {
-        Customer customer = customerDao.get(id);
+        Customer customer = customerService.get(id);
         if (customer == null) {
             logger.error("Getting Customer failed. No Customer found for ID " + id);
             return new ResponseEntity<>("Getting Customer failed. No Customer found for ID " + id,
@@ -61,7 +61,7 @@ public class CustomerController {
 
     @DeleteMapping("/customers/{id}")
     public ResponseEntity deleteCustomer(@PathVariable Long id) {
-        if (null == customerDao.delete(id)) {
+        if (null == customerService.delete(id)) {
             logger.error("Deleting Customer failed. No Customer found for ID " + id);
             return new ResponseEntity<>("Deleting Customer failed. No Customer found for ID " + id,
                                         HttpStatus.NOT_FOUND);
@@ -73,7 +73,7 @@ public class CustomerController {
 
     @PutMapping("/customers/{id}")
     public ResponseEntity updateCustomer(@PathVariable Long id, @RequestBody Customer customer) {
-        customer = customerDao.update(id, customer);
+        customer = customerService.update(id, customer);
 
         if (null == customer) {
             logger.error("Updating Customer failed. Bad request or no Customer found for ID " + id);

@@ -7,19 +7,19 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class CustomerDAOTest {
+public class CustomerDaoTest {
     private Customer customer1;
     private Customer customer2;
     private Customer customer3;
 
-    private CustomerDAO customerDao;
+    private CustomerDao customerDao;
 
     @Before
     public void setUp() throws Exception {
         customer1 = new Customer(101, "Lily", "12 Queen Street", "021-123-4567");
         customer2 = new Customer(102, "Jack", "11 Lake Road", "021-234-5678");
         customer3 = new Customer(103, "Jerry", "12 Lake Road", "027-345-6789");
-        customerDao = new CustomerDAO(new Database());
+        customerDao = new CustomerDaoImpl(new Database());
     }
 
     @After
