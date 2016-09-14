@@ -77,7 +77,7 @@ public class CustomerController {
 
         if (null == customer) {
             logger.error("Updating Customer failed. Bad request or no Customer found for ID " + id);
-            return new ResponseEntity<>("Deleting Customer failed. Bad request or no Customer found for ID " + id,
+            return new ResponseEntity<>("Updating Customer failed. Bad request or no Customer found for ID " + id,
                                         HttpStatus.BAD_REQUEST);
         }
 
